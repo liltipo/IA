@@ -1,0 +1,212 @@
+\documentclass[letter, 10pt]{article}
+\usepackage[latin1]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage[dvips]{graphicx}
+\usepackage{url}
+\usepackage[top=3cm,bottom=3cm,left=3.5cm,right=3.5cm,footskip=1.5cm,headheight=1.5cm,headsep=.5cm,textheight=3cm]{geometry}
+
+
+\usepackage{tikz}
+\usepackage{float} % para usar [H] y fijar figuras/tablas
+\usetikzlibrary{positioning}
+
+
+\begin{document}
+\title{Inteligencia Artificial \\ \begin{Large}Estado del Arte: Problema Vehicle Routing Problem with Backhauls (VRPB)\end{Large}}
+\author{Alvaro Opazo Saavedra}
+\date{\today}
+\maketitle
+
+
+%--------------------No borrar esta secci\'on--------------------------------%
+\section*{Evaluaci\'on}
+
+\begin{tabular}{ll}
+Resumen (5\%): & \underline{\hspace{2cm}} \\
+Introducci\'on (5\%):  & \underline{\hspace{2cm}} \\
+Definici\'on del Problema (10\%):  & \underline{\hspace{2cm}} \\
+Estado del Arte (35\%):  & \underline{\hspace{2cm}} \\
+Modelo Matem\'atico (20\%): &  \underline{\hspace{2cm}}\\
+Conclusiones (20\%): &  \underline{\hspace{2cm}}\\
+Bibliograf\'ia (5\%): & \underline{\hspace{2cm}}\\
+ &  \\
+\textbf{Nota Final (100\%)}:   & \underline{\hspace{2cm}}
+\end{tabular}
+%---------------------------------------------------------------------------%
+\vspace{2cm}
+
+
+\begin{abstract}
+El presente informe aborda el \textbf{Vehicle Routing Problem with Backhauls (VRPB)}, una extensi\'on del problema cl\'asico de ruteo de veh\'iculos que incorpora operaciones de entrega y recolecci\'on bajo restricciones secuenciales. Se analiza el contexto y naturaleza del VRPB, sus variantes m\'as relevantes y la evoluci\'on de los m\'etodos utilizados para su resoluci\'on, desde heur\'isticas cl\'asicas hasta enfoques basados en aprendizaje profundo. Asimismo, se presenta un modelo matem\'atico representativo del problema y se discuten tendencias actuales y perspectivas de investigaci\'on futura en el \'area.
+\end{abstract}
+
+
+\section{Introducci\'on}
+
+Estudiaremos el \textbf{Vehicle Routing Problem with Backhauls (VRPB)}, una extensi\'on compleja del problema de ruteo de veh\'iculos tradicional, en el cual se deben gestionar tanto entregas como recolecciones de mercanc\'ias respetando un orden secuencial estricto. El VRPB presenta desaf\'ios relevantes en la optimizaci\'on log\'istica debido a la necesidad de planificar rutas eficientes bajo restricciones adicionales de precedencia y capacidad. El \textbf{prop\'osito principal} de este documento es realizar un estudio detallado del VRPB, abarcando su definici\'on formal, las principales t\'ecnicas desarrolladas para su resoluci\'on, el estado actual de la investigaci\'on en la materia y la presentaci\'on de un modelo matem\'atico representativo. Asimismo, se busca identificar las tendencias recientes en el abordaje del problema y destacar posibles l\'ineas de investigaci\'on futura.\\
+
+La \textbf{motivaci\'on} de este estudio radica en la relevancia pr\'actica del VRPB para industrias log\'isticas, de distribuci\'on y de servicios, donde la gesti\'on eficiente de entregas y recolecciones constituye un factor cr\'itico para la reducci\'on de costos y mejora de la calidad de servicio. Comprender y mejorar los enfoques de resoluci\'on del VRPB contribuye directamente a optimizar operaciones en escenarios reales de creciente complejidad.\\
+
+La \textbf{estructura del documento} se organiza de la siguiente manera: en primer lugar, se presenta la \textbf{definici\'on del problema}, explicando sus caracter\'isticas principales, variables, restricciones y variantes. A continuaci\'on, se desarrolla el \textbf{estado del arte}, analizando los m\'etodos hist\'oricos y las t\'ecnicas m\'as recientes aplicadas al VRPB; posteriormente, se expone un \textbf{modelo matem\'atico} que formaliza el problema; finalmente, se discuten las \textbf{conclusiones} relevantes del estudio y se proponen posibles l\'ineas futuras de investigaci\'on.
+
+
+\section{Definici\'on del Problema}
+
+El \textbf{VRPB} es una extensi\'on del problema cl\'asico de ruteo de veh\'iculos \textbf{VRP}, en el cual una flota de veh\'iculos parte desde un dep\'osito central para realizar \textbf{entregas} a clientes y posteriormente \textbf{recolectar mercanc\'ias} de otros clientes antes de regresar al dep\'osito~\cite{goetschalckx1989vehicle}. A diferencia del VRP tradicional, donde las rutas se estructuran exclusivamente en funci\'on de entregas, el VRPB introduce la necesidad de gestionar \textbf{dos tipos de operaciones}: entregas (\textbf{linehauls}) y recolecciones (\textbf{backhauls}), imponiendo una restricci\'on secuencial estricta en el recorrido de cada veh\'iculo. El VRPB se caracteriza por la presencia de \textbf{dos conjuntos de clientes} bien diferenciados: aquellos que deben recibir mercanc\'ia y aquellos de los cuales se debe recoger carga. Cada veh\'iculo debe visitar primero todos los clientes linehaul asignados y, solo posteriormente, atender los clientes backhaul. No se permiten rutas que incluyan exclusivamente clientes de recolecci\'on. Esta secuencia obligatoria introduce una complejidad adicional significativa en la planificaci\'on de rutas respecto al VRP cl\'asico.\\
+
+Entre las principales \textbf{variables} involucradas se encuentran la asignaci\'on de clientes a veh\'iculos, el orden de visita de los nodos, el tipo de cliente (linehaul o backhaul) y las demandas de carga asociadas a cada nodo. Asimismo, los veh\'iculos disponen de una \textbf{capacidad limitada}, la cual no puede ser excedida en ning\'un momento del recorrido, considerando tanto las entregas realizadas como las cargas recolectadas. El VRPB est\'a sujeto a diversas \textbf{restricciones}, entre las cuales destacan: (i) cada cliente debe ser atendido exactamente una vez, (ii) cada veh\'iculo debe partir y regresar al dep\'osito, (iii) los veh\'iculos no deben sobrepasar su capacidad m\'axima en ning\'un punto del recorrido, y (iv) debe respetarse la secuencia linehaul-backhaul en cada ruta~\cite{goetschalckx1989vehicle}.\\
+
+El \textbf{objetivo principal} del VRPB es \textbf{minimizar el costo total del viaje} de la flota, usualmente representado en t\'erminos de distancia total recorrida, tiempo total de viaje o costos operacionales agregados. Alcanzar este objetivo requiere una asignaci\'on eficiente de clientes a veh\'iculos y una optimizaci\'on cuidadosa del orden de visita. En cuanto a \textbf{problemas relacionados}, el VRPB se vincula estrechamente con el VRP, pero tambi\'en presenta similitudes con problemas de ruteo de veh\'iculos con recolecci\'on y entrega simult\'aneas, y con variantes de VRP que incorporan restricciones de precedencia.
+
+
+\section{Estado del Arte}
+
+La presente secci\'on ofrece un recorrido hist\'orico y metodol\'ogico sobre el \textbf{VRPB}, abarcando desde su \textbf{origen}, los \textbf{primeros enfoques heur\'isticos} desarrollados para su resoluci\'on, la posterior aplicaci\'on de \textbf{metaheur\'isticas} y \textbf{m\'etodos exactos}, hasta las \textbf{tendencias actuales} que integran t\'ecnicas de \textbf{aprendizaje profundo}. Se destacan tambi\'en las \textbf{representaciones m\'as efectivas} empleadas en su modelado y las \textbf{l\'ineas de investigaci\'on emergentes} en la materia.\\
+
+El \textbf{VRPB} surge como una extensi\'on natural del \textbf{VRP}, uno de los problemas fundamentales en log\'istica y optimizaci\'on combinatoria. Mientras que el VRP cl\'asico, propuesto formalmente en los a\~nos 1950 por Dantzig y Ramser, se enfoca en optimizar rutas de entrega de bienes desde un dep\'osito central a m\'ultiples clientes, el VRPB incorpora la necesidad de gestionar simult\'aneamente \textbf{entregas (linehauls)} y \textbf{recolecciones (backhauls)} en una misma operaci\'on log\'istica.\\
+
+La introducci\'on formal del VRPB se atribuye al trabajo pionero de \textbf{Goetschalckx y Jacobs-Blecha} en 1989~\cite{goetschalckx1989vehicle}, quienes modelaron la problem\'atica inspir\'andose en escenarios reales donde las empresas de retail no solo distribuyen productos, sino que tambi\'en deben recoger mercanc\'ias defectuosas, retornos de clientes, o empaques reutilizables. Esta situaci\'on motiv\'o la necesidad de adaptar las rutas tradicionales de entrega para incluir actividades de recolecci\'on, bajo la condici\'on de que todas las \textbf{entregas deben ser completadas antes de iniciar cualquier recolecci\'on}, a fin de evitar problemas de capacidad en los veh\'iculos.\\
+
+Desde su formulaci\'on inicial, el VRPB ha captado el inter\'es de la comunidad cient\'ifica debido a su relevancia pr\'actica y a la complejidad adicional que introduce respecto al VRP cl\'asico, consolid\'andose como un \'area activa de investigaci\'on en optimizaci\'on de rutas. Tras su formulaci\'on, los primeros esfuerzos de resoluci\'on se orientaron hacia la adaptaci\'on de \textbf{heur\'isticas constructivas} y \textbf{t\'ecnicas de mejora local} previamente utilizadas en el VRP cl\'asico. Una de las estrategias m\'as influyentes fue el \textbf{m\'etodo de ahorros de Clarke y Wright}, el cual fue modificado para respetar la restricci\'on secuencial propia del VRPB, donde todas las entregas deben preceder a las recolecciones~\cite{goetschalckx1989vehicle}.\\
+
+Entre los procedimientos iniciales se destacan tambi\'en las \textbf{heur\'isticas de barrido}, donde los clientes se ordenan seg\'un su \'angulo polar respecto al dep\'osito, y las \textbf{t\'ecnicas de inserci\'on secuencial}, adaptadas para insertar primero clientes linehaul y luego clientes backhaul en las rutas. Estas heur\'isticas lograron generar soluciones factibles de manera eficiente para instancias de tama\~no moderado, aunque sin garantizar la optimalidad global. Adicionalmente, surgieron \textbf{procedimientos de b\'usqueda local} espec\'ificamente dise\~nados para el VRPB, como el \textbf{intercambio restringido de clientes} (swap) que respeta la estructura linehaul-backhaul, y \textbf{operadores de reinserci\'on controlada} que optimizan la asignaci\'on de nodos dentro de una misma fase (entregas o recolecciones). Estos enfoques iniciales sentaron las bases para el posterior desarrollo de t\'ecnicas m\'as sofisticadas basadas en metaheur\'isticas.\\
+
+Con el crecimiento de la capacidad computacional y la necesidad de resolver instancias de mayor escala, comenzaron a desarrollarse \textbf{metaheur\'isticas} especializadas para el VRPB. Entre las primeras estrategias destacan los \textbf{algoritmos gen\'eticos}, los cuales permiten explorar de manera global el espacio de soluciones generando rutas mediante operadores de cruce y mutaci\'on adaptados a la estructura linehaul-backhaul~\cite{koc2018review}. La \textbf{b\'usqueda tab\'u} tambi\'en se consolid\'o como una alternativa eficaz, aplicando mecanismos de memoria para evitar ciclos de mejora local y respetando siempre el orden de visita entre entregas y recolecciones. Adicionalmente, se implementaron variaciones del \textbf{recocido simulado}, t\'ecnica que acepta soluciones no mejoradas de manera controlada para escapar de m\'inimos locales.\\
+
+En paralelo al desarrollo de metaheur\'isticas, se avanz\'o en \textbf{m\'etodos exactos} para resolver el VRPB de forma \'optima. Entre estos destaca el uso de \textbf{programaci\'on lineal entera mixta (MILP)} y el enfoque de \textbf{branch-and-price}, que permite descomponer el problema en subproblemas de generaci\'on de columnas y aprovechar estructuras de rutas v\'alidas~\cite{queiroga2020exact}. Estos m\'etodos, aunque limitados en escalabilidad para instancias muy grandes, permiten validar la calidad de soluciones heur\'isticas mediante comparaci\'on con el \'optimo conocido. Este avance paralelo de metaheur\'isticas y m\'etodos exactos ha enriquecido notablemente el panorama de t\'ecnicas disponibles para abordar el VRPB, ofreciendo un espectro de herramientas adecuado para distintas escalas y necesidades de aplicaci\'on.\\
+
+\textbf{VRPB} ha sido modelado principalmente a partir de \textbf{estructuras de grafos ponderados completos}, donde los nodos representan el dep\'osito y los clientes (de tipo linehaul o backhaul), y las aristas poseen costos asociados a la distancia, tiempo o gasto econ\'omico~\cite{goetschalckx1989vehicle}. Esta representaci\'on permite capturar de manera expl\'icita las restricciones de secuencia requeridas en las rutas. En los enfoques cl\'asicos, la formulaci\'on del problema se realiza mediante \textbf{variables binarias} \( x_{ij} \), donde \( x_{ij} = 1 \) indica que el veh\'iculo viaja del nodo \( i \) al nodo \( j \). Estas formulaciones se complementan con restricciones de capacidad, balance de flujo y, en el caso espec\'ifico del VRPB, restricciones adicionales que aseguran la precedencia de los clientes linehaul sobre los backhaul. Con el advenimiento de t\'ecnicas basadas en \textbf{aprendizaje profundo}, se han propuesto representaciones m\'as complejas que emplean \textbf{arquitecturas encoder-decoder}~\cite{wang2025deep}. En estos modelos, los nodos y sus caracter\'isticas (demanda, tipo de cliente, posici\'on espacial) son codificados como vectores de atributos, permitiendo a la red neuronal aprender estrategias de ruteo de manera autom\'atica. Esta nueva forma de representaci\'on ha abierto la posibilidad de abordar problemas de gran escala sin requerir formulaciones expl\'icitas de restricciones, aunque a costa de altos requerimientos computacionales en la fase de entrenamiento.\\
+
+En la actualidad, la resoluci\'on del VRPB se orienta hacia \textbf{enfoques h\'ibridos} que combinan las fortalezas de distintas t\'ecnicas de optimizaci\'on. Una tendencia destacada es la integraci\'on de \textbf{heur\'isticas constructivas} basadas en m\'etodos de ahorros con \textbf{m\'etodos exactos} como \textbf{branch-and-price} o \textbf{branch-and-cut}, buscando un equilibrio entre calidad de soluci\'on y eficiencia computacional~\cite{queiroga2020exact}. Simult\'aneamente, se ha observado un creciente inter\'es en la aplicaci\'on de \textbf{metaheur\'isticas h\'ibridas}, tales como combinaciones de \textbf{algoritmos gen\'eticos} con \textbf{b\'usqueda tab\'u} o \textbf{recocido simulado}, que permiten mejorar la capacidad de exploraci\'on y explotaci\'on del espacio de soluciones~\cite{sethanan2020hybrid}. Un avance reciente particularmente relevante es la incorporaci\'on de \textbf{t\'ecnicas de aprendizaje profundo}, espec\'ificamente \textbf{Deep Reinforcement Learning (DRL)}, para la generaci\'on de pol\'iticas de ruteo eficientes~\cite{wang2025deep}. En este paradigma, modelos basados en arquitecturas \textbf{encoder-decoder} con mecanismos de \textbf{atenci\'on} aprenden de manera autom\'atica a construir rutas respetando las restricciones del VRPB, lo cual resulta prometedor para enfrentar instancias de gran escala y din\'amicas.\\
+
+Dentro de las \textbf{variantes m\'as conocidas} del VRPB destacan el \textbf{Multi-Trip VRPB (MTVRPB)}, donde los veh\'iculos pueden realizar m\'ultiples recorridos en una jornada~\cite{sethanan2020hybrid}, y el \textbf{Modified VRPB (MVRPB)}, que relaja la restricci\'on de secuencia obligatoria entre linehauls y backhauls, permitiendo una mayor flexibilidad en la planificaci\'on de las rutas~\cite{sukhpal2023multitrip}. Estas variantes abren nuevas posibilidades de optimizaci\'on, aunque tambi\'en incrementan la complejidad computacional del problema.\\
+
+La evoluci\'on del Vehicle Routing Problem with Backhauls refleja una transici\'on progresiva desde la aplicaci\'on de \textbf{heur\'isticas cl\'asicas} hacia la implementaci\'on de \textbf{m\'etodos exactos} y \textbf{metaheur\'isticas avanzadas}, culminando en la exploraci\'on de \textbf{t\'ecnicas de aprendizaje profundo}. Esta trayectoria ha permitido abordar instancias de creciente complejidad, adapt\'andose a las necesidades pr\'acticas de la log\'istica moderna. A pesar de los avances significativos, el VRPB contin\'ua presentando desaf\'ios relevantes, especialmente en contextos de alta din\'amica y gran escala, lo que mantiene a este problema como un campo de investigaci\'on activo y en constante evoluci\'on.
+
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|p{5cm}|p{5cm}|}
+\hline
+\textbf{M\'etodo} & \textbf{Fortalezas} & \textbf{Debilidades} \\
+\hline
+Heur\'isticas & R\'apidas para instancias peque\~nas y medianas. & No garantizan soluci\'on \'optima global. \\
+\hline
+Metaheur\'isticas & Buen desempe\~no en instancias grandes, alta flexibilidad. & Necesitan calibraci\'on cuidadosa de par\'ametros. \\
+\hline
+M\'etodos exactos & Soluci\'on \'optima garantizada, validaci\'on de calidad. & Alto tiempo de c\'omputo en instancias grandes. \\
+\hline
+Aprendizaje profundo (DRL) & Aprendizaje autom\'atico de pol\'iticas de ruteo, adaptable. & Requiere entrenamiento costoso y gran volumen de datos. \\
+\hline
+\end{tabular}
+\caption{Comparativa de enfoques para resolver el VRPB.}
+\label{tab:comparativa}
+\end{table}
+
+
+
+
+\section{Modelo Matem\'atico}
+
+En esta secci\'on se presenta un modelo matem\'atico representativo para el \textbf{Vehicle Routing Problem with Backhauls (VRPB)}, siguiendo las formulaciones tradicionales basadas en \textbf{programaci\'on lineal entera mixta (MILP)}~\cite{goetschalckx1989vehicle}. El modelo busca describir de manera precisa las variables, restricciones y objetivos involucrados en el problema, respetando la estructura secuencial de entregas y recolecciones propia del VRPB.
+
+\subsection*{Par\'ametros y Variables}
+
+\begin{itemize}
+    \item \( V \): Conjunto de todos los nodos del problema, incluyendo el dep\'osito, los clientes linehaul y los clientes backhaul.
+    \item \( V_L \subset V \): Subconjunto de nodos correspondientes a clientes linehaul.
+    \item \( V_B \subset V \): Subconjunto de nodos correspondientes a clientes backhaul.
+    \item \( 0 \in V \): Nodo correspondiente al dep\'osito.
+    \item \( c_{ij} \): Costo de viajar del nodo \( i \) al nodo \( j \), donde \( i, j \in V \).
+    \item \( d_i \): Demanda asociada al nodo \( i \); positiva si es entrega (linehaul), negativa si es recolecci\'on (backhaul).
+    \item \( Q \): Capacidad m\'axima de cada veh\'iculo.
+\end{itemize}
+
+\begin{itemize}
+    \item \( x_{ij} \in \{0,1\} \): Variable binaria, toma el valor 1 si el veh\'iculo viaja directamente del nodo \( i \) al nodo \( j \), y 0 en caso contrario.
+    \item \( q_i \): Carga transportada en el veh\'iculo inmediatamente despu\'es de visitar el nodo \( i \).
+\end{itemize}
+
+\subsection*{Funci\'on Objetivo}
+
+El objetivo del modelo es \textbf{minimizar el costo total} asociado a las rutas efectuadas por la flota de veh\'iculos. Este costo se define como la suma de los costos de viaje entre pares de nodos conectados directamente:
+
+\begin{equation}
+\text{Minimizar} \quad \sum_{i \in V} \sum_{j \in V, \, j \neq i} c_{ij} \, x_{ij}
+\label{eq:objetivo}
+\end{equation}
+
+En palabras, la funci\'on objetivo busca seleccionar un conjunto de arcos entre nodos tal que el costo agregado de las rutas recorridas por los veh\'iculos sea m\'inimo.
+
+\subsection*{Restricci\'on de Visita \'Unica}
+
+Cada cliente (ya sea linehaul o backhaul) debe ser visitado exactamente una vez por un veh\'iculo:
+
+\begin{equation}
+\sum_{j \in V, \, j \neq i} x_{ij} = 1, \quad \forall i \in V \setminus \{0\}
+\label{eq:visita}
+\end{equation}
+
+Esta restricci\'on asegura que cada cliente sea atendido una \'unica vez en la soluci\'on, prohibiendo visitas repetidas o clientes no atendidos.
+
+\subsection*{Restricci\'on de Flujo en el Dep\'osito}
+
+Cada veh\'iculo debe partir del dep\'osito exactamente una vez y retornar al dep\'osito al finalizar su recorrido:
+
+\begin{equation}
+\sum_{j \in V, \, j \neq 0} x_{0j} = \sum_{i \in V, \, i \neq 0} x_{i0}
+\label{eq:flujoDeposito}
+\end{equation}
+
+Esta restricci\'on garantiza que los veh\'iculos inicien y finalicen su recorrido en el dep\'osito central, cerrando las rutas como ciclos completos.
+
+\subsection*{Restricci\'on de Capacidad}
+
+La carga transportada en cada arco no debe superar la capacidad m\'axima del veh\'iculo:
+
+\begin{equation}
+0 \leq q_i + d_j - (1 - x_{ij}) \, Q \leq Q, \quad \forall i, j \in V, \, i \neq j
+\label{eq:capacidad}
+\end{equation}
+
+Esta formulaci\'on asegura que la carga transportada en cada momento respete el l\'imite de capacidad del veh\'iculo, considerando tanto las entregas como las recolecciones realizadas.
+
+\subsection*{Restricci\'on de Precedencia Linehaul-Backhaul}
+
+Un veh\'iculo no puede visitar un cliente backhaul antes de haber completado todas sus visitas a clientes linehaul:
+
+\begin{equation}
+\text{Si } i \in V_B, \, j \in V_L \quad \Rightarrow \quad x_{ij} = 0
+\label{eq:precedencia}
+\end{equation}
+
+Esta restricci\'on impone que una vez que un veh\'iculo visita su primer cliente backhaul, no puede volver a visitar clientes de tipo linehaul, respetando la estructura secuencial del VRPB.
+
+\subsection*{Espacio de B\'usqueda}
+
+El espacio de b\'usqueda del VRPB est\'a compuesto por el conjunto de todas las posibles asignaciones de secuencias de visitas de los veh\'iculos a los clientes, respetando las restricciones de capacidad, precedencia y conexi\'on de las rutas. Para una instancia con \( n_L \) clientes linehaul y \( n_B \) clientes backhaul, el n\'umero de permutaciones posibles para cada ruta que atiende a \( m \leq n \) clientes es del orden de \( m_L! \times m_B! \), donde \( m_L \) y \( m_B \) son las cantidades de clientes linehaul y backhaul asignados a esa ruta, respectivamente. Cuando se consideran todas las particiones posibles de los \( n \) clientes entre \( k \) veh\'iculos, el espacio de b\'usqueda total crece combinatoriamente y puede estimarse, en t\'erminos generales, como:
+
+\begin{equation}
+\sum_{\text{particiones}} \prod_{r=1}^{k} m_{L}^{(r)}! \times m_{B}^{(r)}!
+\end{equation}
+
+donde \( m_{L}^{(r)} \) y \( m_{B}^{(r)} \) representan la cantidad de clientes linehaul y backhaul asignados a la ruta \( r \). Esta combinatoria ilustra el crecimiento exponencial del espacio conforme aumenta el n\'umero de clientes y rutas posibles, lo cual contribuye significativamente a la complejidad computacional del problema~\cite{goetschalckx1989vehicle}.
+
+El modelo matem\'atico propuesto proporciona una representaci\'on formal del Vehicle Routing Problem with Backhauls (VRPB), capturando las caracter\'isticas esenciales del problema y permitiendo su resoluci\'on mediante t\'ecnicas de optimizaci\'on exactas o aproximadas.
+
+
+\section{Conclusiones}
+El estudio del \textbf{Vehicle Routing Problem with Backhauls (VRPB)} ha permitido comprender la complejidad intr\'inseca que introduce la coexistencia de operaciones de entrega y recolecci\'on bajo restricciones de precedencia estrictas. A lo largo del an\'alisis de las t\'ecnicas propuestas en la literatura, se observa que \textbf{no todas las estrategias abordan exactamente el mismo problema}: algunas formulaciones relajan la secuencia de visitas entre linehauls y backhauls, mientras que otras mantienen esta restricci\'on de manera estricta, afectando directamente la estructura de las soluciones. Entre los enfoques revisados, se identifican \textbf{similitudes} en la necesidad de optimizar simult\'aneamente el ruteo y el cumplimiento de las restricciones de capacidad, aunque difieren en las \textbf{estrategias de b\'usqueda} empleadas. Mientras que los m\'etodos heur\'isticos y metaheur\'isticos priorizan la eficiencia computacional y la calidad aproximada de las soluciones, los m\'etodos exactos garantizan optimalidad a costa de un mayor costo computacional. En a\~nos recientes, las t\'ecnicas basadas en \textbf{aprendizaje profundo} han abierto nuevas perspectivas al automatizar la generaci\'on de pol\'iticas de ruteo, aunque todav\'ia enfrentan limitaciones en cuanto a interpretabilidad y generalizaci\'on~\cite{wang2025deep}. \\
+
+Dentro de las principales \textbf{limitaciones} identificadas se encuentran la escalabilidad de los m\'etodos exactos ante instancias de gran tama\~no, la dependencia de par\'ametros en metaheur\'isticas cl\'asicas, y la necesidad de grandes vol\'umenes de datos para entrenar modelos de aprendizaje profundo de manera efectiva. El \textbf{trabajo futuro} en el \'area podr\'ia enfocarse en el desarrollo de \textbf{m\'etodos h\'ibridos} que combinen la robustez de enfoques exactos con la flexibilidad y rapidez de heur\'isticas inteligentes. Adem\'as, resulta prometedor explorar estrategias de aprendizaje por refuerzo profundo adaptativo que puedan transferir pol\'iticas aprendidas entre diferentes configuraciones de VRPB.\\
+
+Como \textbf{propuesta personal}, se sugiere explorar el desarrollo de \textbf{estrategias de b\'usqueda m\'as flexibles}, que puedan adaptarse en funci\'on del progreso de la soluci\'on durante la ejecuci\'on del algoritmo. Por ejemplo, podr\'ia investigarse c\'omo cambiar las decisiones de ruteo cuando se detecta que el algoritmo se encuentra estancado o repitiendo patrones poco efectivos. Adem\'as, podr\'ia ser interesante incorporar \textbf{informaci\'on adicional sobre la red de clientes}, como agrupaciones geogr\'aficas o niveles de prioridad, para guiar la generaci\'on de rutas de forma m\'as inteligente y realista.
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{Referencias}
+
+\end{document} 
