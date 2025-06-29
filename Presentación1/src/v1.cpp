@@ -153,9 +153,8 @@ bool esSolucionFactible(const vector<Ruta>& rutas, const vector<Nodo>& nodos, do
 
 // ------------------ ESCRITURA ------------------
 
-void escribirSalida(const string& nombreInstancia, const SolucionVRPB& solucion, double tiempoSegundos) {
-    string salidaArchivo = nombreInstancia + ".out";
-    ofstream salida(salidaArchivo);
+void escribirSalida(const string& archivoSalida, const SolucionVRPB& solucion, double tiempoSegundos){
+    ofstream salida(archivoSalida);
 
     int totalClientes = 0;
     for (const auto& ruta : solucion.rutas)
@@ -305,8 +304,13 @@ int main(int argc, char* argv[]) {
 
     try {
         InstanciaVRPB instancia = leerInstancia(archivo);
-        string nombreInstancia = archivo.substr(archivo.find_last_of("/\\") + 1);
-        string nombreBase = "Outs/" + nombreInstancia.substr(0, nombreInstancia.find_last_of('.'));
+        if (argc < 3) {
+            cerr << "Uso: " << argv[0] << " <archivo_instancia> <archivo_salida>" << endl;
+            return 1;
+        }
+
+        string archivo = argv[1];
+        string archivoSalida = argv[2];
 
         // SOLUCIÓN INICIAL GREEDY
         vector<Ruta> rutas = generarSolucionGreedy(instancia);
@@ -316,14 +320,14 @@ int main(int argc, char* argv[]) {
         solucion = hillClimbingBI(solucion, instancia);
 
         if (!esSolucionFactible(solucion.rutas, instancia.nodos, instancia.capacidadVehiculo)) {
-            cerr << "ADVERTENCIA: solución " << nombreInstancia.substr(0, nombreInstancia.find_last_of('.')) << " no factible.\n";
+            cerr << "ADVERTENCIA: solución " << archivo << " no factible.\n";
         }
 
         auto fin = chrono::high_resolution_clock::now();
         chrono::duration<double> duracion = fin - inicio;
 
-        escribirSalida(nombreBase, solucion, duracion.count());
-        cout << "Instancia procesada correctamente. Archivo generado: " << nombreBase << ".out\n";
+        escribirSalida(archivoSalida, solucion, duracion.count());
+        cout << "Instancia procesada correctamente. Archivo generado: " << archivoSalida << "\n";
 
     } catch (const exception& e) {
         cerr << "Error: " << e.what() << "\n";
